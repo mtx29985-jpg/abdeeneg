@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أمازون مصر | تسوق الأجهزة الإلكترونية، الموضة، السوبرماركت والمزيد</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        amazon: {
+                            dark: '#131921',
+                            light: '#232f3e',
+                            yellow: '#febd69',
+                            orange: '#f3a847',
+                            button: '#ffd814',
+                            buttonHover: '#f7ca00',
+                            link: '#007185',
+                            accent: '#c45500',
+                            graybg: '#eaeded'
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #eaeded;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-amazon-graybg text-gray-900 min-h-screen flex flex-col selection:bg-amazon-yellow selection:text-black">
+
+    <!-- MAIN NAVIGATION HEADER -->
+    <header class="sticky top-0 z-40 shadow-md">
+        <!-- Top Dark Bar -->
+        <div class="bg-amazon-dark text-white px-2 sm:px-4 py-2 flex items-center justify-between gap-2 sm:gap-4 text-sm">
+            
+            <!-- Logo & Location -->
+            <div class="flex items-center gap-3 cursor-pointer pt-1" onclick="resetFilters()">
+                <div class="flex items-center gap-1">
+                    <span class="text-2xl font-black tracking-wider text-white">amazon</span>
+                    <span class="text-xs text-amazon-yellow font-bold border border-amazon-yellow px-1 rounded">eg</span>
+                </div>
+                <div class="hidden md:flex items-center gap-1.5 text-xs text-gray-300 hover:border hover:border-white p-1 rounded">
+                    <i class="fa-solid fa-location-dot text-amazon-yellow text-sm"></i>
+                    <div class="flex flex-col leading-tight">
+                        <span class="text-[10px] text-gray-400">التوصيل إلى</span>
+                        <span class="font-bold text-white" id="userLocationText">مصر (القاهرة)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="flex-1 max-w-3xl flex items-center">
+                <div class="relative w-full flex rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-amazon-orange">
+                    <select id="searchCategory" class="bg-gray-100 text-gray-700 text-xs sm:text-sm px-2 py-2 border-l border-gray-300 outline-none cursor-pointer hover:bg-gray-200 hidden sm:block">
+                        <option value="all">جميع الأقسام</option>
+                        <option value="electronics">إلكترونيات</option>
+                        <option value="fashion">موضة وإكسسوارات</option>
+                        <option value="supermarket">السوبر ماركت</option>
+                        <option value="home">المنزل والمطبخ</option>
+                    </select>
+
+                    <input type="text" id="searchInput" placeholder="ابحث في amazon.eg" 
+                           class="w-full px-3 py-2 text-gray-800 text-sm outline-none"
+                           onkeyup="handleSearch(event)">
+
+                    <button onclick="executeSearch()" class="bg-amazon-yellow hover:bg-amazon-orange text-amazon-dark px-4 py-2 transition-colors duration-200" aria-label="بحث">
+                        <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center gap-2 sm:gap-4">
+                <div class="hidden lg:flex items-center gap-1 hover:border hover:border-white p-1.5 rounded cursor-pointer">
+                    <span class="text-lg">🇪🇬</span>
+                    <span class="font-bold text-xs">العربية</span>
+                </div>
+
+                <div class="hidden sm:flex flex-col text-xs hover:border hover:border-white p-1.5 rounded cursor-pointer" onclick="openCheckoutModal()">
+                    <span class="text-gray-300 text-[11px]">مرحباً، تسجيل الدخول</span>
+                    <span class="font-bold">الحساب والقوائم <i class="fa-solid fa-caret-down text-[10px]"></i></span>
+                </div>
+
+                <button onclick="toggleCartDrawer()" class="flex items-center gap-1 hover:border hover:border-white p-1.5 rounded relative text-amazon-yellow" aria-label="عربة التسوق">
+                    <div class="relative">
+                        <i class="fa-solid fa-cart-shopping text-2xl sm:text-3xl"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-amazon-orange text-amazon-dark font-extrabold text-xs rounded-full w-5 h-5 flex items-center justify-center border-2 border-amazon-dark">0</span>
+                    </div>
+                    <span class="font-bold text-white text-xs hidden sm:inline self-end mb-1">عربة التسوق</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Sub Nav Bar -->
+        <nav class="bg-amazon-light text-white px-3 py-1.5 text-xs sm:text-sm flex items-center justify-between overflow-x-auto whitespace-nowrap scrollbar-none">
+            <div class="flex items-center gap-4">
+                <button onclick="resetFilters()" class="font-bold flex items-center gap-1.5 hover:border hover:border-white px-2 py-1 rounded">
+                    <i class="fa-solid fa-bars text-base"></i> الكل
+                </button>
+                <a href="#flashDeals" class="hover:border hover:border-white px-2 py-1 rounded text-amazon-yellow font-bold">
+                    <i class="fa-solid fa-bolt text-xs ml-1"></i> عروض اليوم
+                </a>
+                <button onclick="filterByCategory('electronics')" class="hover:border hover:border-white px-2 py-1 rounded">إلكترونيات</button>
+                <button onclick="filterByCategory('supermarket')" class="hover:border hover:border-white px-2 py-1 rounded">السوبر ماركت</button>
+                <button onclick="filterByCategory('fashion')" class="hover:border hover:border-white px-2 py-1 rounded">الموضة</button>
+                <button onclick="filterByCategory('home')" class="hover:border hover:border-white px-2 py-1 rounded">المنزل والمطبخ</button>
+                <span class="text-gray-400">|</span>
+                <span class="text-xs text-gray-300 hidden md:inline"><i class="fa-solid fa-truck-fast text-amazon-yellow"></i> شحن مجاني للطلبات أكثر من 350 جنيه</span>
+            </div>
+            <div class="hidden lg:block font-semibold text-amazon-yellow">
+                تطبيق أمازون مصر | خصم 15% على أول طلب
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <main class="flex-grow max-w-[1500px] mx-auto w-full px-2 sm:px-4 pb-12">
+
+        <!-- HERO BANNER -->
+        <section class="relative my-4 rounded-xl overflow-hidden shadow-lg border border-gray-300">
+            <div class="bg-gradient-to-l from-slate-900 via-amazon-light to-slate-900 text-white p-6 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 min-h-[260px]">
+                <div class="space-y-3 max-w-xl text-center md:text-right">
+                    <span class="bg-amazon-accent text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">التخفيضات الكبرى في مصر</span>
+                    <h1 class="text-2xl sm:text-4xl font-extrabold leading-tight text-white">
+                        وفر حتى <span class="text-amazon-yellow">50%</span> على الأجهزة الذكية والموضة
+                    </h1>
+                    <p class="text-sm text-gray-300">توصيل سريع لجميع المحافظات مع الدفع عند الاستلام والإرجاع المجاني.</p>
+                    <div class="pt-2 flex flex-wrap gap-3 justify-center md:justify-start">
+                        <a href="#productsGrid" class="bg-amazon-button hover:bg-amazon-buttonHover text-amazon-dark font-bold px-6 py-2.5 rounded-lg shadow transition">تسوق الآن</a>
+                        <a href="#flashDeals" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-5 py-2.5 rounded-lg backdrop-blur transition">شاهد عروض اليوم</a>
+                    </div>
+                </div>
+                <div class="relative w-48 sm:w-64 h-48 sm:h-56 flex items-center justify-center">
+                    <img id="heroImage" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80" 
+                         alt="Amazon Banner" 
+                         class="max-h-full object-contain drop-shadow-2xl transform hover:scale-105 transition duration-300"
+                         onerror="this.src='https://placehold.co/400x300/131921/FFFFFF?text=Amazon+Egypt'">
+                </div>
+            </div>
+        </section>
+
+        <!-- CATEGORY CARDS -->
+        <section class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 my-6">
+            <div onclick="filterByCategory('electronics')" class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer border border-gray-200 flex flex-col justify-between group">
+                <div>
+                    <h3 class="font-bold text-gray-800 group-hover:text-amazon-link text-sm sm:text-base mb-2">الإلكترونيات والجوالات</h3>
+                    <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&q=80" alt="Electronics" class="w-full h-32 object-cover rounded-md mb-2" onerror="this.src='https://placehold.co/300x200?text=Electronics'">
+                </div>
+                <span class="text-xs font-bold text-amazon-link group-hover:underline">استكشف المزيد ←</span>
+            </div>
+
+            <div onclick="filterByCategory('supermarket')" class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer border border-gray-200 flex flex-col justify-between group">
+                <div>
+                    <h3 class="font-bold text-gray-800 group-hover:text-amazon-link text-sm sm:text-base mb-2">مستلزمات السوبرماركت</h3>
+                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&q=80" alt="Supermarket" class="w-full h-32 object-cover rounded-md mb-2" onerror="this.src='https://placehold.co/300x200?text=Supermarket'">
+                </div>
+                <span class="text-xs font-bold text-amazon-link group-hover:underline">تصفح المنتجات ←</span>
+            </div>
+
+            <div onclick="filterByCategory('fashion')" class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer border border-gray-200 flex flex-col justify-between group">
+                <div>
+                    <h3 class="font-bold text-gray-800 group-hover:text-amazon-link text-sm sm:text-base mb-2">أزياء وموضة 2026</h3>
+                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300&q=80" alt="Fashion" class="w-full h-32 object-cover rounded-md mb-2" onerror="this.src='https://placehold.co/300x200?text=Fashion'">
+                </div>
+                <span class="text-xs font-bold text-amazon-link group-hover:underline">شاهد التشكيلة ←</span>
+            </div>
+
+            <div onclick="filterByCategory('home')" class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer border border-gray-200 flex flex-col justify-between group">
+                <div>
+                    <h3 class="font-bold text-gray-800 group-hover:text-amazon-link text-sm sm:text-base mb-2">أجهزة المنزل والمطبخ</h3>
+                    <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=300&q=80" alt="Home" class="w-full h-32 object-cover rounded-md mb-2" onerror="this.src='https://placehold.co/300x200?text=Home'">
+                </div>
+                <span class="text-xs font-bold text-amazon-link group-hover:underline">تسوق الأجهزة ←</span>
+            </div>
+        </section>
+
+        <!-- FLASH DEALS SECTION -->
+        <section id="flashDeals" class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 my-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b pb-4 mb-4">
+                <div class="flex items-center gap-3">
+                    <span class="bg-red-600 text-white font-extrabold text-xs sm:text-sm px-3 py-1 rounded-full animate-pulse">
+                        <i class="fa-solid fa-fire ml-1"></i> عروض خاطفة
+                    </span>
+                    <h2 class="text-lg sm:text-xl font-bold text-gray-900">ينتهي العرض خلال:</h2>
+                    <div id="countdown" class="flex items-center gap-1 font-mono font-bold text-red-600 text-base sm:text-lg dir-ltr">
+                        <span id="hours" class="bg-gray-100 border px-2 py-0.5 rounded">05</span>:
+                        <span id="minutes" class="bg-gray-100 border px-2 py-0.5 rounded">42</span>:
+                        <span id="seconds" class="bg-gray-100 border px-2 py-0.5 rounded">18</span>
+                    </div>
+                </div>
+                <button onclick="resetFilters()" class="text-xs sm:text-sm font-bold text-amazon-link hover:underline">عرض جميع العروض</button>
+            </div>
+
+            <div id="flashDealsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Rendered by JS -->
+            </div>
+        </section>
+
+        <!-- PRODUCTS CATALOG -->
+        <section id="productsGrid" class="my-8">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-900" id="catalogTitle">جميع المنتجات المتاحة في مصر</h2>
+                    <p class="text-xs sm:text-sm text-gray-500" id="catalogSubtitle">تصفح أفضل المنتجات بخصومات حصرية وشحن سريع</p>
+                </div>
+
+                <div class="flex items-center gap-3 text-xs sm:text-sm">
+                    <label class="font-semibold text-gray-700">ترتيب حسب:</label>
+                    <select id="sortSelect" onchange="sortProducts()" class="bg-white border border-gray-300 rounded-lg px-3 py-1.5 font-medium outline-none focus:ring-1 focus:ring-amazon-orange">
+                        <option value="featured">الأبرز</option>
+                        <option value="low-high">السعر: من الأقل للأعلى</option>
+                        <option value="high-low">السعر: من الأعلى للأقل</option>
+                        <option value="rating">أعلى تقييم</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Products Container -->
+            <div id="productsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+    </main>
+
+    <!-- CART DRAWER -->
+    <div id="cartDrawer" class="fixed inset-0 z-50 overflow-hidden hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="toggleCartDrawer()"></div>
+
+        <div class="pointer-events-auto fixed inset-y-0 left-0 max-w-full flex">
+            <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col">
+                <!-- Header -->
+                <div class="bg-amazon-dark text-white p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-cart-shopping text-amazon-yellow text-xl"></i>
+                        <h2 class="text-base font-bold">عربة التسوق الخاص بك</h2>
+                    </div>
+                    <button onclick="toggleCartDrawer()" class="text-gray-300 hover:text-white p-1" aria-label="إغلاق">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Free Shipping Indicator -->
+                <div class="bg-amazon-yellow/20 p-3 border-b border-amazon-yellow/40 text-xs">
+                    <p id="freeShippingText" class="font-bold text-gray-800 mb-1">أضف 350 ج.م إضافية للحصول على شحن مجاني!</p>
+                    <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                        <div id="shippingProgressBar" class="bg-amazon-orange h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Cart Items Container -->
+                <div id="cartItemsList" class="flex-grow overflow-y-auto p-4 space-y-4 divide-y divide-gray-100">
+                    <!-- Dynamic Items -->
+                </div>
+
+                <!-- Footer Summary -->
+                <div class="p-4 border-t border-gray-200 bg-gray-50 space-y-3">
+                    <div class="flex justify-between text-sm text-gray-600">
+                        <span>إجمالي المنتجات:</span>
+                        <span id="cartSubtotalItems" class="font-semibold">0 منتج</span>
+                    </div>
+                    <div class="flex justify-between text-base font-bold text-gray-900">
+                        <span>المجموع الكلي:</span>
+                        <span id="cartTotalPrice" class="text-amazon-accent font-black text-xl">0.00 ج.م</span>
+                    </div>
+                    <button onclick="openCheckoutModal()" class="w-full bg-amazon-button hover:bg-amazon-buttonHover text-amazon-dark font-extrabold py-3 rounded-xl shadow transition duration-200">
+                        متابعة عملية الشراء (Checkout)
+                    </button>
+                    <button onclick="clearCart()" class="w-full text-xs text-red-600 hover:underline text-center block pt-1">
+                        تفريغ سلة التسوق
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK VIEW MODAL -->
+    <div id="quickViewModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 hidden">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 relative overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button onclick="closeQuickView()" class="absolute top-4 left-4 bg-gray-100 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center" aria-label="إغلاق">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modalContent" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Dynamic Content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- CHECKOUT SIMULATOR MODAL -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-2xl">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center gap-2 text-amazon-dark border-b pb-3 mb-4">
+                <i class="fa-solid fa-shield-halved text-green-600 text-2xl"></i>
+                <h3 class="font-bold text-lg">إتمام الطلب الشراء الآمن</h3>
+            </div>
+            
+            <form onsubmit="processOrder(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">الاسم بالكامل</label>
+                    <input type="text" required placeholder="مثال: أحمد محمد" class="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-1 focus:ring-amazon-orange">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">رقم الهاتف (مصر)</label>
+                    <input type="tel" required placeholder="010XXXXXXXX" class="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-1 focus:ring-amazon-orange">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">المحافظة والعنوان بالتفصيل</label>
+                    <input type="text" required placeholder="القاهرة، شارع التحرير، بناء 12" class="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-1 focus:ring-amazon-orange">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">طريقة الدفع</label>
+                    <select class="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-1 focus:ring-amazon-orange">
+                        <option value="cod">الدفع عند الاستلام (Cash on Delivery)</option>
+                        <option value="vodafone">فودافون كاش / محفظة إلكترونية</option>
+                        <option value="card">بطاقة ائتلافية / خصم مباشر</option>
+                    </select>
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-amazon-button hover:bg-amazon-buttonHover text-amazon-dark font-extrabold py-3 rounded-xl shadow transition">
+                        تأكيد وإرسال الطلب الآن
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 left-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- FOOTER -->
+    <footer class="bg-amazon-dark text-white text-xs mt-auto">
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-full bg-amazon-light hover:bg-slate-700 py-3 text-center text-xs font-bold transition">
+            الرجوع إلى الأعلى ↑
+        </button>
+
+        <div class="max-w-[1200px] mx-auto px-4 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 border-b border-gray-700">
+            <div>
+                <h4 class="font-bold text-sm mb-3 text-white">تعرف علينا</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="#" class="hover:underline">معلومات عن أمازون</a></li>
+                    <li><a href="#" class="hover:underline">الوظائف</a></li>
+                    <li><a href="#" class="hover:underline">أخبار أمازون مصر</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-3 text-white">تسوق معنا</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="#" class="hover:underline">حسابك</a></li>
+                    <li><a href="#" class="hover:underline">مشترياتك</a></li>
+                    <li><a href="#" class="hover:underline">عناوينك</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-3 text-white">بيع على أمازون</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="#" class="hover:underline">البيع على أمازون مصر</a></li>
+                    <li><a href="#" class="hover:underline">الشحن بواسطة أمازون</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-3 text-white">مساعدة والدعم</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="#" class="hover:underline">سياسة الإرجاع</a></li>
+                    <li><a href="#" class="hover:underline">أسعار ووسائل الشحن</a></li>
+                    <li><a href="#" class="hover:underline">خدمة العملاء</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="py-6 text-center text-gray-400 space-y-2">
+            <div class="flex items-center justify-center gap-2">
+                <span class="text-xl font-black text-white">amazon.eg</span>
+                <span>🇪🇬 مصر</span>
+            </div>
+            <p>© 2026 جميع الحقوق محفوظة لشركة أمازون مصر أو الشركات التابعة لها.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Database
+        const products = [
+            {
+                id: 1,
+                name: "سماعات رأس لاسلكية إلغاء الضوضاء الصوتية الفائقة",
+                category: "electronics",
+                price: 1850,
+                oldPrice: 2400,
+                rating: 4.7,
+                reviews: 320,
+                image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
+                badge: "الأكثر مبيعاً",
+                isFlash: true,
+                claimed: 78,
+                specs: ["بطارية تدوم 40 ساعة", "بلوتوث 5.3", "ميكروفون مزدوج"]
+            },
+            {
+                id: 2,
+                name: "هاتف ذكي بذاكرة 256 جيجابايت وكاميرا بدقة 108 ميجابكسل",
+                category: "electronics",
+                price: 12400,
+                oldPrice: 14500,
+                rating: 4.8,
+                reviews: 512,
+                image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80",
+                badge: "عرض حصري",
+                isFlash: true,
+                claimed: 92,
+                specs: ["شاشة AMOLED 120Hz", "شحن سريع 67 واط", "ضمان سنة"]
+            },
+            {
+                id: 3,
+                name: "ساعة ذكية رياضية بشاشة لمس وتتبع اللياقة البدنية",
+                category: "electronics",
+                price: 2100,
+                oldPrice: 2900,
+                rating: 4.5,
+                reviews: 180,
+                image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80",
+                badge: "خصم 28%",
+                isFlash: false,
+                specs: ["مقاومة للماء IP68", "قياس نبضات القلب", "دعم عربي"]
+            },
+            {
+                id: 4,
+                name: "ماكينة تحضير الإسبريسو والقهوة السريعة للمنزل",
+                category: "home",
+                price: 3950,
+                oldPrice: 4800,
+                rating: 4.6,
+                reviews: 240,
+                image: "https://images.unsplash.com/photo-1517668808822-9ebe02f2a6e8?w=500&q=80",
+                badge: "شحن مجاني",
+                isFlash: true,
+                claimed: 45,
+                specs: ["ضغط 15 بار", "خزان ماء 1.2 لتر", "مبخر حليب"]
+            },
+            {
+                id: 5,
+                name: "حذاء رياضي مريح للجري والمشي اليومي - أسود",
+                category: "fashion",
+                price: 890,
+                oldPrice: 1200,
+                rating: 4.3,
+                reviews: 94,
+                image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80",
+                badge: "جديد",
+                isFlash: false,
+                specs: ["نعل ناعم ممتص للصدمات", "قماش خفيف", "مقاسات 40-45"]
+            },
+            {
+                id: 6,
+                name: "قلاية هوائية بدون زيت سعة 5.5 لتر بشاشة رقمية",
+                category: "home",
+                price: 4200,
+                oldPrice: 5500,
+                rating: 4.9,
+                reviews: 680,
+                image: "https://images.unsplash.com/photo-1585515320310-259814833e62?w=500&q=80",
+                badge: "توفير 1300 ج.م",
+                isFlash: true,
+                claimed: 88,
+                specs: ["توفير 85% من الدهون", "8 برامج جاهزة", "وعاء غير لاصق"]
+            },
+            {
+                id: 7,
+                name: "عبوة زيت زيتون بكر ممتاز نقي 1 لتر - عصرة أولى",
+                category: "supermarket",
+                price: 340,
+                oldPrice: 410,
+                rating: 4.7,
+                reviews: 145,
+                image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500&q=80",
+                badge: "سوبرماركت",
+                isFlash: false,
+                specs: ["طبيعي 100%", "حموضة أقل من 0.8%", "إنتاج مصري ممتاز"]
+            },
+            {
+                id: 8,
+                name: "حقيبة ظهر أنيقة للكمبيوتر المحمول مقاومة للماء",
+                category: "fashion",
+                price: 650,
+                oldPrice: 850,
+                rating: 4.4,
+                reviews: 89,
+                image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80",
+                badge: "خصم 23%",
+                isFlash: false,
+                specs: ["تتسع حتى 15.6 بوصة", "منفذ USB خارجي", "جيوب متعددة"]
+            }
+        ];
+
+        // State Management
+        let cart = JSON.parse(localStorage.getItem('amazon_eg_cart')) || [];
+        let activeCategory = 'all';
+
+        // Load Event
+        window.addEventListener('DOMContentLoaded', () => {
+            renderFlashDeals();
+            renderProducts(products);
+            updateCartUI();
+            startCountdown();
+        });
+
+        function renderProducts(items) {
+            const container = document.getElementById('productsContainer');
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full bg-white p-8 text-center rounded-xl border">
+                        <i class="fa-solid fa-box-open text-4xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-600 font-bold">لم نجد أي منتجات تطابق بحثك.</p>
+                        <button onclick="resetFilters()" class="mt-3 bg-amazon-yellow text-xs font-bold px-4 py-2 rounded-lg">إعادة عرض الكل</button>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = items.map(p => `
+                <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition duration-200 flex flex-col justify-between group">
+                    <div class="p-4 relative">
+                        ${p.badge ? `<span class="absolute top-2 right-2 bg-amazon-accent text-white text-[10px] font-extrabold px-2 py-0.5 rounded z-10">${p.badge}</span>` : ''}
+                        
+                        <div class="w-full h-44 flex items-center justify-center mb-3 cursor-pointer overflow-hidden" onclick="openQuickView(${p.id})">
+                            <img src="${p.image}" alt="${p.name}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/300x300?text=Product'">
+                        </div>
+
+                        <h3 onclick="openQuickView(${p.id})" class="text-xs sm:text-sm font-bold text-gray-800 line-clamp-2 hover:text-amazon-link cursor-pointer mb-1 leading-snug">
+                            ${p.name}
+                        </h3>
+
+                        <div class="flex items-center gap-1 text-xs mb-2">
+                            <div class="text-amazon-orange">
+                                ${getStarRating(p.rating)}
+                            </div>
+                            <span class="text-gray-500 text-[11px]">(${p.reviews})</span>
+                        </div>
+
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-lg font-black text-gray-900">${p.price.toLocaleString()} <span class="text-xs font-normal">ج.م</span></span>
+                            ${p.oldPrice ? `<span class="text-xs text-gray-400 line-through">${p.oldPrice.toLocaleString()} ج.م</span>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-gray-50 border-t border-gray-100 flex gap-2">
+                        <button onclick="addToCart(${p.id})" class="flex-1 bg-amazon-button hover:bg-amazon-buttonHover text-amazon-dark font-extrabold text-xs py-2 rounded-lg shadow-sm flex items-center justify-center gap-1 transition">
+                            <i class="fa-solid fa-cart-plus text-sm"></i> أضف إلى العربة
+                        </button>
+                        <button onclick="openQuickView(${p.id})" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2.5 py-2 rounded-lg text-xs font-bold transition">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderFlashDeals() {
+            const container = document.getElementById('flashDealsContainer');
+            const flashItems = products.filter(p => p.isFlash);
+
+            container.innerHTML = flashItems.map(p => `
+                <div class="bg-gray-50 rounded-lg p-3 border border-red-100 flex flex-col justify-between">
+                    <div>
+                        <div class="h-32 flex items-center justify-center mb-2">
+                            <img src="${p.image}" alt="${p.name}" class="max-h-full object-contain" onerror="this.src='https://placehold.co/200x200?text=Offer'">
+                        </div>
+                        <h4 class="text-xs font-bold text-gray-800 line-clamp-2 mb-1">${p.name}</h4>
+                        <div class="text-amazon-accent font-extrabold text-sm mb-1">${p.price.toLocaleString()} ج.م</div>
+                        
+                        <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-1">
+                            <div class="bg-red-600 h-full" style="width: ${p.claimed}%"></div>
+                        </div>
+                        <span class="text-[10px] text-gray-500 font-semibold">تم بيع ${p.claimed}%</span>
+                    </div>
+
+                    <button onclick="addToCart(${p.id})" class="mt-3 w-full bg-amazon-button hover:bg-amazon-buttonHover text-amazon-dark font-bold text-xs py-1.5 rounded shadow-sm">
+                        اطلب فوراً
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function getStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalf = rating % 1 >= 0.5;
+            let stars = '';
+            for (let i = 0; i < fullStars; i++) stars += '<i class="fa-solid fa-star"></i>';
+            if (hasHalf) stars += '<i class="fa-solid fa-star-half-stroke"></i>';
+            return stars;
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existing = cart.find(item => item.id === productId);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            saveCart();
+            updateCartUI();
+            showToast(`تمت إضافة "${product.name}" إلى عربة التسوق`);
+        }
+
+        function updateCartUI() {
+            const cartCountEl = document.getElementById('cartCount');
+            const cartItemsList = document.getElementById('cartItemsList');
+            const cartSubtotalItems = document.getElementById('cartSubtotalItems');
+            const cartTotalPrice = document.getElementById('cartTotalPrice');
+            const freeShippingText = document.getElementById('freeShippingText');
+            const shippingProgressBar = document.getElementById('shippingProgressBar');
+
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            cartCountEl.textContent = totalCount;
+            cartSubtotalItems.textContent = `${totalCount} منتج`;
+            cartTotalPrice.textContent = `${totalPrice.toLocaleString()} ج.م`;
+
+            const target = 350;
+            if (totalPrice >= target) {
+                freeShippingText.innerHTML = '<span class="text-green-700 font-bold"><i class="fa-solid fa-circle-check"></i> مبروك! لقد حصلت على شحن مجاني!</span>';
+                shippingProgressBar.style.width = '100%';
+                shippingProgressBar.classList.replace('bg-amazon-orange', 'bg-green-600');
+            } else {
+                const diff = target - totalPrice;
+                freeShippingText.textContent = `أضف ${diff.toLocaleString()} ج.م إضافية للحصول على شحن مجاني!`;
+                shippingProgressBar.style.width = `${Math.min((totalPrice / target) * 100, 100)}%`;
+                shippingProgressBar.classList.replace('bg-green-600', 'bg-amazon-orange');
+            }
+
+            if (cart.length === 0) {
+                cartItemsList.innerHTML = `
+                    <div class="text-center py-12 text-gray-500">
+                        <i class="fa-solid fa-cart-shopping text-5xl text-gray-300 mb-3"></i>
+                        <p class="font-bold">عربة التسوق فارغة حالياً</p>
+                    </div>`;
+                return;
+            }
+
+            cartItemsList.innerHTML = cart.map(item => `
+                <div class="flex gap-3 pt-3 items-center justify-between">
+                    <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain rounded border" onerror="this.src='https://placehold.co/100x100?text=Item'">
+                    <div class="flex-1">
+                        <h4 class="text-xs font-bold text-gray-800 line-clamp-1">${item.name}</h4>
+                        <div class="text-xs text-amazon-accent font-extrabold mt-0.5">${(item.price * item.quantity).toLocaleString()} ج.م</div>
+                        
+                        <div class="flex items-center gap-2 mt-2">
+                            <div class="flex items-center border rounded bg-gray-50">
+                                <button onclick="changeQuantity(${item.id}, -1)" class="px-2 py-0.5 text-xs font-bold hover:bg-gray-200">-</button>
+                                <span class="px-2 text-xs font-bold">${item.quantity}</span>
+                                <button onclick="changeQuantity(${item.id}, 1)" class="px-2 py-0.5 text-xs font-bold hover:bg-gray-200">+</button>
+                            </div>
+                            <button onclick="removeFromCart(${item.id})" class="text-xs text-red-500 hover:underline">إزالة</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changeQuantity(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+            item.quantity += delta;
+            if (item.quantity <= 0) {
+                cart = cart.filter(i => i.id !== id);
+            }
+            saveCart();
+            updateCartUI();
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(i => i.id !== id);
+            saveCart();
+            updateCartUI();
+            showToast("تمت إزالة المنتج من العربة");
+        }
+
+        function clearCart() {
+            cart = [];
+            saveCart();
+            updateCartUI();
+            showToast("تم تفريغ عربة التسوق بالكامل");
+        }
+
+        function saveCart() {
+            localStorage.setItem('amazon_eg_cart', JSON.stringify(cart));
+        }
+
+        function toggleCartDrawer() {
+            document.getElementById('cartDrawer').classList.toggle('hidden');
+        }
+
+        // Search & Filter
+        function filterByCategory(category) {
+            activeCategory = category;
+            const filtered = category === 'all' ? products : products.filter(p => p.category === category);
+            renderProducts(filtered);
+            document.getElementById('productsGrid').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchCategory').value = 'all';
+            filterByCategory('all');
+        }
+
+        function handleSearch(e) {
+            if (e.key === 'Enter') executeSearch();
+        }
+
+        function executeSearch() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const categorySelect = document.getElementById('searchCategory').value;
+
+            let result = products;
+            if (categorySelect !== 'all') result = result.filter(p => p.category === categorySelect);
+            if (query) result = result.filter(p => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query));
+
+            renderProducts(result);
+            document.getElementById('productsGrid').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function sortProducts() {
+            const sortVal = document.getElementById('sortSelect').value;
+            let current = [...products];
+
+            if (activeCategory !== 'all') current = current.filter(p => p.category === activeCategory);
+            if (sortVal === 'low-high') current.sort((a, b) => a.price - b.price);
+            else if (sortVal === 'high-low') current.sort((a, b) => b.price - a.price);
+            else if (sortVal === 'rating') current.sort((a, b) => b.rating - a.rating);
+
+            renderProducts(current);
+        }
+
+        // Quick View Modal
+        function openQuickView(id) {
+            const p = products.find(prod => prod.id === id);
+            if (!p) return;
+
+            document.getElementById('modalContent').innerHTML = `
+                <div class="flex items-center justify-center p-4">
+                    <img src="${p.image}" alt="${p.name}" class="max-h-64 object-contain rounded-lg">
+                </div>
+                <div class="space-y-3 flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-amazon-accent bg-amber-50 px-2 py-1 rounded">${p.badge || 'منتج أصلي'}</span>
+                        <h2 class="text-lg font-bold text-gray-900 mt-2">${p.name}</h2>
+                        <div class="flex items-center gap-2 my-2">
+                            <span class="text-amazon-orange text-xs">${getStarRating(p.rating)}</span>
+                            <span class="text-xs text-gray-500">(${p.rating} من 5)</span>
+                        </div>
+                        <div class="text-2xl font-black text-gray-900 my-2">
+                            ${p.price.toLocaleString()} <span class="text-sm font-semibold">ج.م</span>
+                        </div>
+                    </div>
+                    <button onclick="addToCart(${p.id}); closeQuickView();" class="w-full bg-amazon-button hover:bg-amazon-buttonHover text-amazon-dark font-extrabold py-3 rounded-xl shadow transition">
+                        أضف إلى عربة التسوق
+                    </button>
+                </div>
+            `;
+            document.getElementById('quickViewModal').classList.remove('hidden');
+        }
+
+        function closeQuickView() {
+            document.getElementById('quickViewModal').classList.add('hidden');
+        }
+
+        // Checkout Modal Logic
+        function openCheckoutModal() {
+            if (cart.length === 0) {
+                showToast("عربة التسوق فارغة! أضف بعض المنتجات أولاً.");
+                return;
+            }
+            toggleCartDrawer();
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function processOrder(e) {
+            e.preventDefault();
+            closeCheckoutModal();
+            cart = [];
+            saveCart();
+            updateCartUI();
+            showToast("تم إرسال طلبك بنجاح! شكراً لتسوقك معنا في أمازون مصر 🎉");
+        }
+
+        // Toast Notification System
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'bg-amazon-dark text-white text-xs font-bold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-amazon-yellow transition-all duration-300 pointer-events-auto';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-amazon-yellow text-base"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        // Timer
+        function startCountdown() {
+            let totalSeconds = 5 * 3600 + 42 * 60 + 18;
+            setInterval(() => {
+                if (totalSeconds <= 0) return;
+                totalSeconds--;
+                document.getElementById('hours').textContent = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(totalSeconds % 60).padStart(2, '0');
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
